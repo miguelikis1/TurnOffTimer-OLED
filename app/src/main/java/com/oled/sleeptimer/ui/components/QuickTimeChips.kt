@@ -15,21 +15,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.DeleteOutline
-import androidx.compose.material.icons.outlined.Remove
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.oled.sleeptimer.ui.theme.AccentCyan
-import com.oled.sleeptimer.ui.theme.OledBorder
 import com.oled.sleeptimer.ui.theme.OledBorderSubtle
 import com.oled.sleeptimer.ui.theme.OledSurface
 import com.oled.sleeptimer.ui.theme.StatusAmber
@@ -44,6 +41,7 @@ fun QuickTimeChips(
     onAddMinutes: (Int) -> Unit,
     onAdjustMinutes: (Int) -> Unit,
     onReset: () -> Unit,
+    onOpenCustomTimeDialog: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -74,7 +72,38 @@ fun QuickTimeChips(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Fila 2: Ajuste fino (-5m, -1m, +1m, +5m) y Reset
+            // Fila 2: Botón destacado para fijar tiempo exacto personalizado
+            Box(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(OledSurface)
+                    .border(1.dp, AccentCyan.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
+                    .clickable(onClick = onOpenCustomTimeDialog)
+                    .padding(horizontal = 18.dp, vertical = 9.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = Icons.Outlined.Edit,
+                        contentDescription = null,
+                        tint = AccentCyan,
+                        modifier = Modifier.size(15.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "Fijar tiempo exacto (Horas : Minutos)",
+                        style = Typography.labelLarge.copy(
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = 13.sp
+                        ),
+                        color = AccentCyan
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Fila 3: Ajuste fino (-5m, -1m, +1m, +5m) y Reset
             Text(
                 text = "AJUSTE FINO",
                 style = Typography.labelSmall.copy(

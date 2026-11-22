@@ -10,6 +10,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -56,7 +60,8 @@ fun CircularTimerDisplay(
     idleDurationMs: Long,
     modifier: Modifier = Modifier,
     size: Dp = 270.dp,
-    strokeWidth: Dp = 6.dp
+    strokeWidth: Dp = 6.dp,
+    onClick: (() -> Unit)? = null
 ) {
     val isRunning = state.isRunning
     val isPaused = state.isPaused
@@ -92,9 +97,17 @@ fun CircularTimerDisplay(
         label = "pulseAlpha"
     )
 
+    val clickableModifier = if (!isRunning && onClick != null) {
+        Modifier.clickable(onClick = onClick)
+    } else {
+        Modifier
+    }
+
     Box(
         modifier = modifier
             .size(size)
+            .clip(CircleShape)
+            .then(clickableModifier)
             .background(OledBlack),
         contentAlignment = Alignment.Center
     ) {
@@ -190,16 +203,38 @@ fun CircularTimerDisplay(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            // Subtítulo tenue
-            Text(
-                text = if (isRunning) {
-                    if (isPaused) "Toca Reanudar para continuar" else "Apagado al llegar a 00:00"
-                } else {
-                    if (idleDurationMs > 0L) "Pulsa Iniciar para comenzar" else "Añade minutos abajo"
-                },
-                style = Typography.bodyMedium,
-                color = TextSecondary
-            )
+            // Subtítulo / Indicación táctil
+            if (!isRunning && onClick != null) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .padding(horizontal = 8.dp, vertical = 2.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Edit,
+                        contentDescription = null,
+                        tint = AccentCyan,
+                        modifier = Modifier.size(13.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = "Toca para tiempo exacto",
+                        style = Typography.bodyMedium.copy(fontSize = 12.sp),
+                        color = AccentCyan
+                    )
+                }
+            } else {
+                Text(
+                    text = if (isRunning) {
+                        if (isPaused) "Toca Reanudar para continuar" else "Apagado al llegar a 00:00"
+                    } else {
+                        "Pulsa Iniciar para comenzar"
+                    },
+                    style = Typography.bodyMedium,
+                    color = TextSecondary
+                )
+            }
         }
     }
 }

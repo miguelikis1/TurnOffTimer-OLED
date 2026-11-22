@@ -66,6 +66,7 @@ import com.oled.sleeptimer.receiver.SleepDeviceAdminReceiver
 import com.oled.sleeptimer.service.SleepTimerService
 import com.oled.sleeptimer.ui.components.AdminPermissionCard
 import com.oled.sleeptimer.ui.components.CircularTimerDisplay
+import com.oled.sleeptimer.ui.components.CustomTimePickerDialog
 import com.oled.sleeptimer.ui.components.KeepScreenOnToggle
 import com.oled.sleeptimer.ui.components.QuickTimeChips
 import com.oled.sleeptimer.ui.theme.AccentCyan
@@ -95,6 +96,7 @@ fun MainScreen(
     var selectedMinutes by remember { mutableIntStateOf(30) }
     var keepScreenOn by remember { mutableStateOf(false) }
     var isAdminActive by remember { mutableStateOf(SleepDeviceAdminReceiver.isAdminActive(context)) }
+    var showCustomTimeDialog by remember { mutableStateOf(false) }
 
     // Comprobar estado de admin al recomponer
     LaunchedEffect(Unit) {
@@ -194,30 +196,38 @@ fun MainScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Anillo central y contador visual
+            // Anillo central y contador visual (pulsable para ajustar tiempo exacto al estar inactivo)
             CircularTimerDisplay(
                 state = timerState,
                 idleDurationMs = selectedMinutes * 60 * 1000L,
-                size = 280.dp
+                size = 280.dp,
+                onClick = {
+                    if (!timerState.isRunning) {
+                        showCustomTimeDialog = true
+                    }
+                }
             )
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(26.dp))
 
-            // Selector de tiempo o adición al vuelo
+            // Selector de tiempo con accesos rápidos, ajuste fino y botón de tiempo exacto
             QuickTimeChips(
                 isRunning = timerState.isRunning,
                 onAddMinutes = { minutesToAdd ->
                     if (timerState.isRunning) {
                         SleepTimerService.addTime(context, minutesToAdd * 60 * 1000L)
                     } else {
-                        selectedMinutes = (selectedMinutes + minutesToAdd).coerceIn(1, 720)
+                        selectedMinutes = (selectedMinutes + minutesToAdd).coerceIn(1, 1440)
                     }
                 },
                 onAdjustMinutes = { delta ->
-                    selectedMinutes = (selectedMinutes + delta).coerceIn(1, 720)
+                    selectedMinutes = (selectedMinutes + delta).coerceIn(1, 1440)
                 },
                 onReset = {
                     selectedMinutes = 0
+                },
+                onOpenCustomTimeDialog = {
+                    showCustomTimeDialog = true
                 }
             )
 
@@ -435,5 +445,19 @@ fun MainScreen(
                 modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
             )
         }
+    }
+
+    // Diálogo modal OLED para selección de tiempo exacto (Horas : Minutos)
+    if (showCustomTimeDialog) {
+        CustomTimePickerDialog(
+            initialTotalMinutes = selectedMinutes,
+            onConfirm = { customMins ->
+                selectedMinutes = customMins
+                showCustomTimeDialog = false
+            },
+            onDismiss = {
+                showCustomTimeDialog = false
+            }
+        )
     }
 }

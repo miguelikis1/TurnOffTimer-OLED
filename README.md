@@ -3,7 +3,6 @@
 [![Release](https://img.shields.io/badge/Release-v1.0.0-00F0FF?style=for-the-badge&logo=android)](release/SleepTimer-v1.0.0.apk)
 [![Android](https://img.shields.io/badge/Android-8.0%2B%20(API%2026--35)-black?style=for-the-badge&logo=android)](https://developer.android.com)
 [![Size](https://img.shields.io/badge/APK%20Size-~931%20KB-success?style=for-the-badge)](release/SleepTimer-v1.0.0.apk)
-[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
 Aplicación nativa para Android desarrollada en **Kotlin** y **Jetpack Compose** con diseño minimalista **OLED Dark Mode puro** (`#000000`), sin dependencias superfluas, sin anuncios y sin telemetría. Diseñada para escuchar música, podcasts o vídeos por la noche y pausar la reproducción y apagar la pantalla automáticamente al finalizar el tiempo establecido.
 
@@ -18,15 +17,16 @@ Puedes descargar el instalador APK precompilado y firmado directamente:
 
 ## 📱 Características Principales
 
-1. **Diseño OLED Puro (`#000000`) & Tipografía Limpia**:
+1. **Selector de Tiempo Exacto & Personalizado (Novedad)**:
+   - **Toca el reloj central**: Pulsa directamente sobre los dígitos para abrir el selector modal OLED.
+   - **Botón "Fijar tiempo exacto"**: Ajuste manual de **Horas (0–23)** y **Minutos (0–59)** con steppers táctiles `+` / `-` o escritura directa por teclado numérico.
+   - Botones rápidos de preajuste: `+5 min`, `+15 min`, `+30 min`, `+60 min` y ajuste fino `-5m`, `-1m`, `+1m`, `+5m`.
+   - Adición de tiempo al vuelo durante la cuenta atrás activa (`+5m`, `+10m`, `+15m`, `+30m`).
+
+2. **Diseño OLED Puro (`#000000`) & Tipografía Limpia**:
    - Fondo negro absoluto para ahorro energético en pantallas AMOLED / OLED.
    - Tipografía geométrica sans-serif con dígitos tabulares (`fontFeatureSettings = "tnum"`) que impiden fluctuaciones horizontales en el contador.
    - Anillo visual Canvas con arco de progreso degradado en cian/índigo y pulso sutil de actividad.
-
-2. **Selector de Tiempo Rápido & Ajuste Fino**:
-   - Botones rápidos de acceso directo: `+5 min`, `+15 min`, `+30 min`, `+60 min`.
-   - Botones de ajuste fino: `-5m`, `-1m`, `+1m`, `+5m` y botón de reinicio `C`.
-   - Adición de tiempo al vuelo durante la cuenta atrás activa (`+5m`, `+10m`, `+15m`, `+30m`).
 
 3. **Interruptor "Mantener pantalla encendida"**:
    - Integrado de forma fluida en la interfaz.
@@ -67,17 +67,3 @@ Puedes descargar el instalador APK precompilado y firmado directamente:
 - **Permisos de red**: Ninguno (`android.permission.INTERNET` no requerido ni declarado).
 - **Telemetría / SDKs externos**: Cero.
 - **Tamaño del binario**: ~931 KB.
-
----
-
-## 🚀 Compilación Local
-
-Para compilar el APK en tu máquina:
-```bash
-# Versión Debug
-./gradlew assembleDebug
-
-# Versión Release
-./gradlew assembleRelease
-```
-El archivo resultante se encuentra en `app/build/outputs/apk/release/app-release.apk`.
