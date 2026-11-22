@@ -1,0 +1,64 @@
+name: Build & Publish Release APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+      - '[0-9]+.[0-9]+.[0-9]+'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build & Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Grant Execute Permission for Gradle Wrapper
+        run: chmod +x gradlew
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Rename APK for Release
+        run: |
+          cp app/build/outputs/apk/release/app-release.apk SleepTimer-OLED-${{ github.ref_name }}.apk
+
+      - name: Create GitHub Release and Upload APK
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            SleepTimer-OLED-${{ github.ref_name }}.apk
+            release/SleepTimer-v1.0.0.apk
+          name: "Sleep Timer OLED ${{ github.ref_name }}"
+          body: |
+            ## Sleep Timer OLED v${{ github.ref_name }}
+            
+            Aplicación nativa para Android (Kotlin + Jetpack Compose) con diseño OLED Dark Mode (`#000000`).
+            
+            ### Novedades en la v1.0.0:
+            - ⏱️ Selector de tiempo con accesos rápidos (+5, +15, +30, +60 min) y ajuste fino.
+            - 💡 Toggle integrado para mantener la pantalla encendida (`FLAG_KEEP_SCREEN_ON`).
+            - 🔔 Foreground Service fiable en segundo plano con notificación silenciosa.
+            - 🎵 Pausa automática de multimedia (`AUDIOFOCUS_GAIN` + `KeyEvent.KEYCODE_MEDIA_PAUSE`).
+            - 🔒 Bloqueo y apagado automático de pantalla con `DevicePolicyManager.lockNow()`.
+            - 🛡️ Opción discreta para desactivar el permiso de administrador para desinstalación fácil.
+            - 🪶 Súper ligero: APK release de solo ~931 KB, sin anuncios ni telemetría.
+            
+            ### Descarga directa:
+            Descarga el archivo APK adjunto e instálalo en cualquier dispositivo con Android 8.0 o superior.
+          draft: false
+          prerelease: false
+          generate_release_notes: false

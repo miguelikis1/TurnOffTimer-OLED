@@ -1,0 +1,14 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.DS_Store
+/build
+app/build/
+/captures
+.externalNativeBuild
+.cxx
+
+# Ignorar builds temporales de APK pero permitir el APK final versionado en release/
+*.apk
+!release/*.apk

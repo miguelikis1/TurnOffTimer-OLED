@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Sleep Timer</string>
+    <string name="notification_channel_name">Temporizador de apagado</string>
+    <string name="notification_channel_desc">Muestra la cuenta atrás activa del temporizador de apagado</string>
+    <string name="notification_title">Temporizador de apagado activo</string>
+    <string name="notification_remaining">Tiempo restante: %1$s</string>
+    <string name="notification_action_cancel">Cancelar</string>
+    
+    <!-- Device Admin Strings -->
+    <string name="device_admin_label">Sleep Timer - Bloqueo de pantalla</string>
+    <string name="device_admin_description">Permiso necesario para apagar y bloquear la pantalla de forma segura al finalizar el temporizador.</string>
+    <string name="device_admin_explanation">Requerido para bloquear y apagar la pantalla automáticamente cuando finalice el temporizador de apagado.</string>
+</resources>
