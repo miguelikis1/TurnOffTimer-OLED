@@ -1,27 +1,27 @@
 # Sleep Timer OLED (Android Nativo - Kotlin + Jetpack Compose)
 
-[![Release](https://img.shields.io/badge/Release-v1.0.0-00F0FF?style=for-the-badge&logo=android)](release/SleepTimer-v1.0.0.apk)
+[![Release](https://img.shields.io/badge/Release-v1.0.1-00F0FF?style=for-the-badge&logo=android)](release/SleepTimer-v1.0.1.apk)
 [![Android](https://img.shields.io/badge/Android-8.0%2B%20(API%2026--35)-black?style=for-the-badge&logo=android)](https://developer.android.com)
-[![Size](https://img.shields.io/badge/APK%20Size-~931%20KB-success?style=for-the-badge)](release/SleepTimer-v1.0.0.apk)
+[![Size](https://img.shields.io/badge/APK%20Size-~931%20KB-success?style=for-the-badge)](release/SleepTimer-v1.0.1.apk)
 
 Aplicación nativa para Android desarrollada en **Kotlin** y **Jetpack Compose** con diseño minimalista **OLED Dark Mode puro** (`#000000`), sin dependencias superfluas, sin anuncios y sin telemetría. Diseñada para escuchar música, podcasts o vídeos por la noche y pausar la reproducción y apagar la pantalla automáticamente al finalizar el tiempo establecido.
 
 ---
 
-## 📥 Descarga Directa del APK
+## 📥 Descarga Directa del APK (v1.0.1)
 
 Puedes descargar el instalador APK precompilado y firmado directamente:
-- **[Descargar SleepTimer-v1.0.0.apk](release/SleepTimer-v1.0.0.apk)** *(Solo ~931 KB, compilación Release optimizada)*
+- **[Descargar SleepTimer-v1.0.1.apk](release/SleepTimer-v1.0.1.apk)** *(Solo ~931 KB, compilación Release optimizada)*
 
 ---
 
 ## 📱 Características Principales
 
-1. **Selector de Tiempo Exacto & Personalizado (Novedad)**:
+1. **Selector de Tiempo Exacto (Horas : Minutos : Segundos) — v1.0.1**:
    - **Toca el reloj central**: Pulsa directamente sobre los dígitos para abrir el selector modal OLED.
-   - **Botón "Fijar tiempo exacto"**: Ajuste manual de **Horas (0–23)** y **Minutos (0–59)** con steppers táctiles `+` / `-` o escritura directa por teclado numérico.
-   - Botones rápidos de preajuste: `+5 min`, `+15 min`, `+30 min`, `+60 min` y ajuste fino `-5m`, `-1m`, `+1m`, `+5m`.
-   - Adición de tiempo al vuelo durante la cuenta atrás activa (`+5m`, `+10m`, `+15m`, `+30m`).
+   - **Botón "Fijar tiempo exacto (Horas : Min : Seg)"**: Permite configurar **Horas (0–23)**, **Minutos (0–59)** y **Segundos (0–59)** con steppers táctiles `+` / `-` o escritura numérica directa con teclado.
+   - Botones rápidos de preajuste: `+5 min`, `+15 min`, `+30 min`, `+60 min` y ajuste fino de segundos/minutos (`-1m`, `-15s`, `+15s`, `+1m`).
+   - Adición de tiempo al vuelo durante la cuenta atrás activa (`+30s`, `+5m`, `+10m`, `+15m`).
 
 2. **Diseño OLED Puro (`#000000`) & Tipografía Limpia**:
    - Fondo negro absoluto para ahorro energético en pantallas AMOLED / OLED.
@@ -59,6 +59,7 @@ Puedes descargar el instalador APK precompilado y firmado directamente:
 
 ## 🛠️ Requisitos Técnicos
 
+- **Versión**: 1.0.1 (Build 2)
 - **Lenguaje**: Kotlin 2.0.21
 - **UI Framework**: Jetpack Compose con Material 3 (BOM 2024.10.01)
 - **Min SDK**: 26 (Android 8.0 Oreo)

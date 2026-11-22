@@ -37,7 +37,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -55,16 +54,17 @@ import com.oled.sleeptimer.ui.theme.Typography
 
 @Composable
 fun CustomTimePickerDialog(
-    initialTotalMinutes: Int,
-    onConfirm: (Int) -> Unit,
+    initialTotalSeconds: Long,
+    onConfirm: (Long) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var hours by remember { mutableIntStateOf(initialTotalMinutes / 60) }
-    var minutes by remember { mutableIntStateOf(initialTotalMinutes % 60) }
+    var hours by remember { mutableIntStateOf((initialTotalSeconds / 3600).toInt()) }
+    var minutes by remember { mutableIntStateOf(((initialTotalSeconds % 3600) / 60).toInt()) }
+    var seconds by remember { mutableIntStateOf((initialTotalSeconds % 60).toInt()) }
 
-    // Textos para entrada directa por teclado
     var hoursText by remember { mutableStateOf(hours.toString().padStart(2, '0')) }
     var minutesText by remember { mutableStateOf(minutes.toString().padStart(2, '0')) }
+    var secondsText by remember { mutableStateOf(seconds.toString().padStart(2, '0')) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -97,7 +97,7 @@ fun CustomTimePickerDialog(
                         color = TextWhite
                     )
                     Text(
-                        text = "Establece horas y minutos libremente",
+                        text = "Ajusta horas, minutos y segundos al milímetro",
                         style = Typography.bodyMedium.copy(fontSize = 12.sp),
                         color = TextSecondary
                     )
@@ -109,9 +109,9 @@ fun CustomTimePickerDialog(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
-                // Selectores de Horas y Minutos
+                // Fila con los 3 campos: Horas, Minutos y Segundos
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center,
@@ -127,23 +127,18 @@ fun CustomTimePickerDialog(
                             hours = clamped
                             hoursText = clamped.toString().padStart(2, '0')
                         },
-                        onTextChange = { rawText ->
-                            val filtered = rawText.filter { it.isDigit() }.take(2)
+                        onTextChange = { raw ->
+                            val filtered = raw.filter { it.isDigit() }.take(2)
                             hoursText = filtered
-                            val parsed = filtered.toIntOrNull() ?: 0
-                            hours = parsed.coerceIn(0, 23)
+                            hours = (filtered.toIntOrNull() ?: 0).coerceIn(0, 23)
                         }
                     )
 
-                    // Dos puntos separadores
                     Text(
                         text = ":",
-                        style = Typography.displayMedium.copy(
-                            fontWeight = FontWeight.Light,
-                            fontSize = 36.sp
-                        ),
+                        style = Typography.displayMedium.copy(fontSize = 28.sp),
                         color = TextWhite,
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 6.dp)
                     )
 
                     // Columna de Minutos
@@ -156,20 +151,43 @@ fun CustomTimePickerDialog(
                             minutes = clamped
                             minutesText = clamped.toString().padStart(2, '0')
                         },
-                        onTextChange = { rawText ->
-                            val filtered = rawText.filter { it.isDigit() }.take(2)
+                        onTextChange = { raw ->
+                            val filtered = raw.filter { it.isDigit() }.take(2)
                             minutesText = filtered
-                            val parsed = filtered.toIntOrNull() ?: 0
-                            minutes = parsed.coerceIn(0, 59)
+                            minutes = (filtered.toIntOrNull() ?: 0).coerceIn(0, 59)
+                        }
+                    )
+
+                    Text(
+                        text = ":",
+                        style = Typography.displayMedium.copy(fontSize = 28.sp),
+                        color = TextWhite,
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 6.dp)
+                    )
+
+                    // Columna de Segundos
+                    TimeFieldStepper(
+                        label = "SEGUNDOS",
+                        value = seconds,
+                        textValue = secondsText,
+                        onValueChange = { newVal ->
+                            val clamped = newVal.coerceIn(0, 59)
+                            seconds = clamped
+                            secondsText = clamped.toString().padStart(2, '0')
+                        },
+                        onTextChange = { raw ->
+                            val filtered = raw.filter { it.isDigit() }.take(2)
+                            secondsText = filtered
+                            seconds = (filtered.toIntOrNull() ?: 0).coerceIn(0, 59)
                         }
                     )
                 }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(18.dp))
 
-                // Accesos rápidos predefinidos dentro del diálogo
+                // Accesos rápidos comunes
                 Text(
-                    text = "PREAJUSTES COMUNES",
+                    text = "PREAJUSTES",
                     style = Typography.labelSmall.copy(
                         fontWeight = FontWeight.SemiBold,
                         letterSpacing = 1.sp
@@ -182,35 +200,25 @@ fun CustomTimePickerDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally)
                 ) {
+                    PresetDurationChip("30s") {
+                        hours = 0; minutes = 0; seconds = 30
+                        hoursText = "00"; minutesText = "00"; secondsText = "30"
+                    }
+                    PresetDurationChip("5m") {
+                        hours = 0; minutes = 5; seconds = 0
+                        hoursText = "00"; minutesText = "05"; secondsText = "00"
+                    }
                     PresetDurationChip("15m") {
-                        hours = 0
-                        minutes = 15
-                        hoursText = "00"
-                        minutesText = "15"
+                        hours = 0; minutes = 15; seconds = 0
+                        hoursText = "00"; minutesText = "15"; secondsText = "00"
                     }
                     PresetDurationChip("30m") {
-                        hours = 0
-                        minutes = 30
-                        hoursText = "00"
-                        minutesText = "30"
-                    }
-                    PresetDurationChip("45m") {
-                        hours = 0
-                        minutes = 45
-                        hoursText = "00"
-                        minutesText = "45"
+                        hours = 0; minutes = 30; seconds = 0
+                        hoursText = "00"; minutesText = "30"; secondsText = "00"
                     }
                     PresetDurationChip("1h") {
-                        hours = 1
-                        minutes = 0
-                        hoursText = "01"
-                        minutesText = "00"
-                    }
-                    PresetDurationChip("2h") {
-                        hours = 2
-                        minutes = 0
-                        hoursText = "02"
-                        minutesText = "00"
+                        hours = 1; minutes = 0; seconds = 0
+                        hoursText = "01"; minutesText = "00"; secondsText = "00"
                     }
                 }
             }
@@ -218,8 +226,8 @@ fun CustomTimePickerDialog(
         confirmButton = {
             Button(
                 onClick = {
-                    val totalMinutes = (hours * 60) + minutes
-                    onConfirm(totalMinutes.coerceAtLeast(1))
+                    val totalSecs = (hours.toLong() * 3600L) + (minutes.toLong() * 60L) + seconds.toLong()
+                    onConfirm(totalSecs.coerceAtLeast(1L))
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = AccentCyan,
@@ -251,19 +259,22 @@ private fun TimeFieldStepper(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.width(90.dp)
+        modifier = Modifier.width(76.dp)
     ) {
         Text(
             text = label,
-            style = Typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+            style = Typography.labelSmall.copy(
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 10.sp
+            ),
             color = TextMuted,
-            modifier = Modifier.padding(bottom = 6.dp)
+            modifier = Modifier.padding(bottom = 4.dp)
         )
 
         // Botón incremento (+)
         Box(
             modifier = Modifier
-                .size(40.dp)
+                .size(36.dp)
                 .clip(CircleShape)
                 .background(OledSurface)
                 .border(1.dp, OledBorderSubtle, CircleShape)
@@ -274,19 +285,20 @@ private fun TimeFieldStepper(
                 imageVector = Icons.Outlined.Add,
                 contentDescription = "Aumentar $label",
                 tint = TextWhite,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(18.dp)
             )
         }
 
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
-        // Campo de texto editable directamente con teclado numérico
+        // Campo numérico directo
         OutlinedTextField(
             value = textValue,
             onValueChange = onTextChange,
             textStyle = Typography.headlineMedium.copy(
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
                 fontFeatureSettings = "tnum"
             ),
             singleLine = true,
@@ -299,16 +311,16 @@ private fun TimeFieldStepper(
                 focusedContainerColor = OledBlack,
                 unfocusedContainerColor = OledBlack
             ),
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
         // Botón decremento (-)
         Box(
             modifier = Modifier
-                .size(40.dp)
+                .size(36.dp)
                 .clip(CircleShape)
                 .background(OledSurface)
                 .border(1.dp, OledBorderSubtle, CircleShape)
@@ -319,7 +331,7 @@ private fun TimeFieldStepper(
                 imageVector = Icons.Outlined.Remove,
                 contentDescription = "Reducir $label",
                 tint = TextWhite,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(18.dp)
             )
         }
     }
@@ -336,7 +348,7 @@ private fun PresetDurationChip(
             .background(OledSurface)
             .border(1.dp, OledBorderSubtle, RoundedCornerShape(10.dp))
             .clickable(onClick = onClick)
-            .padding(horizontal = 8.dp, vertical = 6.dp),
+            .padding(horizontal = 7.dp, vertical = 6.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(

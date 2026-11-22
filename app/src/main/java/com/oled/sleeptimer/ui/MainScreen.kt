@@ -4,12 +4,8 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -42,10 +38,9 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -61,7 +56,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.oled.sleeptimer.R
-import com.oled.sleeptimer.model.TimerState
 import com.oled.sleeptimer.receiver.SleepDeviceAdminReceiver
 import com.oled.sleeptimer.service.SleepTimerService
 import com.oled.sleeptimer.ui.components.AdminPermissionCard
@@ -71,7 +65,6 @@ import com.oled.sleeptimer.ui.components.KeepScreenOnToggle
 import com.oled.sleeptimer.ui.components.QuickTimeChips
 import com.oled.sleeptimer.ui.theme.AccentCyan
 import com.oled.sleeptimer.ui.theme.OledBlack
-import com.oled.sleeptimer.ui.theme.OledBorder
 import com.oled.sleeptimer.ui.theme.OledBorderSubtle
 import com.oled.sleeptimer.ui.theme.OledSurface
 import com.oled.sleeptimer.ui.theme.StatusAmber
@@ -92,8 +85,8 @@ fun MainScreen(
 
     val timerState by SleepTimerService.timerState.collectAsStateWithLifecycle()
 
-    // Minutos seleccionados cuando el temporizador está inactivo (por defecto 30 minutos)
-    var selectedMinutes by remember { mutableIntStateOf(30) }
+    // Segundos seleccionados cuando el temporizador está inactivo (por defecto 30 minutos = 1800 seg)
+    var selectedTotalSeconds by remember { mutableLongStateOf(30 * 60L) }
     var keepScreenOn by remember { mutableStateOf(false) }
     var isAdminActive by remember { mutableStateOf(SleepDeviceAdminReceiver.isAdminActive(context)) }
     var showCustomTimeDialog by remember { mutableStateOf(false) }
@@ -185,7 +178,7 @@ fun MainScreen(
 
                 // Indicador de modo OLED puro
                 Text(
-                    text = "OLED DARK",
+                    text = "v1.0.1",
                     style = Typography.labelSmall.copy(
                         fontWeight = FontWeight.SemiBold,
                         letterSpacing = 1.sp
@@ -196,10 +189,10 @@ fun MainScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Anillo central y contador visual (pulsable para ajustar tiempo exacto al estar inactivo)
+            // Anillo central y contador visual (pulsable para ajustar horas, minutos y segundos exactos)
             CircularTimerDisplay(
                 state = timerState,
-                idleDurationMs = selectedMinutes * 60 * 1000L,
+                idleDurationMs = selectedTotalSeconds * 1000L,
                 size = 280.dp,
                 onClick = {
                     if (!timerState.isRunning) {
@@ -213,18 +206,18 @@ fun MainScreen(
             // Selector de tiempo con accesos rápidos, ajuste fino y botón de tiempo exacto
             QuickTimeChips(
                 isRunning = timerState.isRunning,
-                onAddMinutes = { minutesToAdd ->
+                onAddSeconds = { secondsToAdd ->
                     if (timerState.isRunning) {
-                        SleepTimerService.addTime(context, minutesToAdd * 60 * 1000L)
+                        SleepTimerService.addTime(context, secondsToAdd * 1000L)
                     } else {
-                        selectedMinutes = (selectedMinutes + minutesToAdd).coerceIn(1, 1440)
+                        selectedTotalSeconds = (selectedTotalSeconds + secondsToAdd).coerceIn(1L, 86400L)
                     }
                 },
-                onAdjustMinutes = { delta ->
-                    selectedMinutes = (selectedMinutes + delta).coerceIn(1, 1440)
+                onAdjustSeconds = { deltaSecs ->
+                    selectedTotalSeconds = (selectedTotalSeconds + deltaSecs).coerceIn(1L, 86400L)
                 },
                 onReset = {
-                    selectedMinutes = 0
+                    selectedTotalSeconds = 0L
                 },
                 onOpenCustomTimeDialog = {
                     showCustomTimeDialog = true
@@ -237,9 +230,9 @@ fun MainScreen(
             if (!timerState.isRunning) {
                 Button(
                     onClick = {
-                        if (selectedMinutes <= 0) {
+                        if (selectedTotalSeconds <= 0L) {
                             coroutineScope.launch {
-                                snackbarHostState.showSnackbar("Selecciona al menos 1 minuto para iniciar.")
+                                snackbarHostState.showSnackbar("Selecciona al menos 1 segundo para iniciar.")
                             }
                             return@Button
                         }
@@ -258,7 +251,7 @@ fun MainScreen(
 
                         SleepTimerService.start(
                             context = context,
-                            durationMs = selectedMinutes * 60 * 1000L,
+                            durationMs = selectedTotalSeconds * 1000L,
                             keepScreenOn = keepScreenOn
                         )
                     },
@@ -447,12 +440,12 @@ fun MainScreen(
         }
     }
 
-    // Diálogo modal OLED para selección de tiempo exacto (Horas : Minutos)
+    // Diálogo modal OLED para selección de tiempo exacto (Horas : Minutos : Segundos)
     if (showCustomTimeDialog) {
         CustomTimePickerDialog(
-            initialTotalMinutes = selectedMinutes,
-            onConfirm = { customMins ->
-                selectedMinutes = customMins
+            initialTotalSeconds = selectedTotalSeconds,
+            onConfirm = { customSecs ->
+                selectedTotalSeconds = customSecs
                 showCustomTimeDialog = false
             },
             onDismiss = {

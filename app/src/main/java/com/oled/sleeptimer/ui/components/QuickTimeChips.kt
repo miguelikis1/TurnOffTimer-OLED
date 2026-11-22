@@ -38,8 +38,8 @@ import com.oled.sleeptimer.ui.theme.Typography
 @Composable
 fun QuickTimeChips(
     isRunning: Boolean,
-    onAddMinutes: (Int) -> Unit,
-    onAdjustMinutes: (Int) -> Unit,
+    onAddSeconds: (Long) -> Unit,
+    onAdjustSeconds: (Long) -> Unit,
     onReset: () -> Unit,
     onOpenCustomTimeDialog: () -> Unit,
     modifier: Modifier = Modifier
@@ -64,15 +64,15 @@ fun QuickTimeChips(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
             ) {
-                QuickPresetChip(label = "+5 min") { onAddMinutes(5) }
-                QuickPresetChip(label = "+15 min") { onAddMinutes(15) }
-                QuickPresetChip(label = "+30 min") { onAddMinutes(30) }
-                QuickPresetChip(label = "+60 min") { onAddMinutes(60) }
+                QuickPresetChip(label = "+5 min") { onAddSeconds(5 * 60L) }
+                QuickPresetChip(label = "+15 min") { onAddSeconds(15 * 60L) }
+                QuickPresetChip(label = "+30 min") { onAddSeconds(30 * 60L) }
+                QuickPresetChip(label = "+60 min") { onAddSeconds(60 * 60L) }
             }
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Fila 2: Botón destacado para fijar tiempo exacto personalizado
+            // Fila 2: Botón destacado para fijar tiempo exacto (Horas : Minutos : Segundos)
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(14.dp))
@@ -91,7 +91,7 @@ fun QuickTimeChips(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Fijar tiempo exacto (Horas : Minutos)",
+                        text = "Fijar tiempo exacto (Horas : Min : Seg)",
                         style = Typography.labelLarge.copy(
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 13.sp
@@ -103,7 +103,7 @@ fun QuickTimeChips(
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // Fila 3: Ajuste fino (-5m, -1m, +1m, +5m) y Reset
+            // Fila 3: Ajuste fino (-1m, -15s, +15s, +1m) y Reset
             Text(
                 text = "AJUSTE FINO",
                 style = Typography.labelSmall.copy(
@@ -133,24 +133,24 @@ fun QuickTimeChips(
                 )
 
                 FineAdjustmentChip(
-                    text = "-5m",
-                    onClick = { onAdjustMinutes(-5) }
-                )
-
-                FineAdjustmentChip(
                     text = "-1m",
-                    onClick = { onAdjustMinutes(-1) }
+                    onClick = { onAdjustSeconds(-60L) }
                 )
 
                 FineAdjustmentChip(
-                    text = "+1m",
-                    onClick = { onAdjustMinutes(1) },
+                    text = "-15s",
+                    onClick = { onAdjustSeconds(-15L) }
+                )
+
+                FineAdjustmentChip(
+                    text = "+15s",
+                    onClick = { onAdjustSeconds(15L) },
                     isAccent = true
                 )
 
                 FineAdjustmentChip(
-                    text = "+5m",
-                    onClick = { onAdjustMinutes(5) },
+                    text = "+1m",
+                    onClick = { onAdjustSeconds(60L) },
                     isAccent = true
                 )
             }
@@ -170,10 +170,10 @@ fun QuickTimeChips(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
             ) {
-                QuickPresetChip(label = "+5 min") { onAddMinutes(5) }
-                QuickPresetChip(label = "+10 min") { onAddMinutes(10) }
-                QuickPresetChip(label = "+15 min") { onAddMinutes(15) }
-                QuickPresetChip(label = "+30 min") { onAddMinutes(30) }
+                QuickPresetChip(label = "+30s") { onAddSeconds(30L) }
+                QuickPresetChip(label = "+5 min") { onAddSeconds(5 * 60L) }
+                QuickPresetChip(label = "+10 min") { onAddSeconds(10 * 60L) }
+                QuickPresetChip(label = "+15 min") { onAddSeconds(15 * 60L) }
             }
         }
     }

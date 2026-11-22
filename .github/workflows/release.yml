@@ -40,12 +40,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG_NAME="${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.0.0' }}"
+          TAG_NAME="${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v1.0.1' }}"
           echo "Publicando release para tag: $TAG_NAME"
           
-          # Crear release o actualizar existente y subir el APK
-          gh release create "$TAG_NAME" app/build/outputs/apk/release/app-release.apk#SleepTimer-OLED-v1.0.0.apk \
+          gh release create "$TAG_NAME" app/build/outputs/apk/release/app-release.apk#SleepTimer-OLED-$TAG_NAME.apk \
             --title "Sleep Timer OLED $TAG_NAME" \
-            --notes "Release de Sleep Timer OLED (APK nativo ~931 KB listo para instalar)." \
+            --notes "Release de Sleep Timer OLED $TAG_NAME (Selector exacto de Horas, Minutos y Segundos, APK nativo ~931 KB)." \
             --latest || \
-          gh release upload "$TAG_NAME" app/build/outputs/apk/release/app-release.apk#SleepTimer-OLED-v1.0.0.apk --clobber
+          gh release upload "$TAG_NAME" app/build/outputs/apk/release/app-release.apk#SleepTimer-OLED-$TAG_NAME.apk --clobber
